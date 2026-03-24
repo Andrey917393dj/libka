@@ -164,9 +164,18 @@ function Start(A, B)
         ScreenGui:Destroy()
     end)
 
-    -- FIX: deprecated GetMouse().KeyDown replaced with UserInputService.InputBegan
+    -- Toggle UI: default J; override with getgenv().ArcticUiHotkey = "Semicolon" etc. (Enum.KeyCode name)
     UIS.InputBegan:Connect(function(input, gameProcessed)
-        if not gameProcessed and input.KeyCode == Enum.KeyCode.J then
+        if gameProcessed then return end
+        local key = Enum.KeyCode.J
+        pcall(function()
+            local g = getgenv and getgenv() or nil
+            local name = g and g.ArcticUiHotkey
+            if type(name) == "string" and Enum.KeyCode[name] then
+                key = Enum.KeyCode[name]
+            end
+        end)
+        if input.KeyCode == key then
             Frame.Visible = not Frame.Visible
         end
     end)
